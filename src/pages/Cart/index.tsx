@@ -20,6 +20,9 @@ interface Product {
 const Cart = (): JSX.Element => {
   const { cart, removeProduct, updateProductAmount } = useCart();
 
+  // const cartFormatted = cart.map(product => ({
+  //   // TODO
+  // }))
   const total =
     formatPrice(
       cart.reduce((sumTotal, product) => {
@@ -91,7 +94,7 @@ const Cart = (): JSX.Element => {
                   <button
                     type="button"
                     data-testid="increment-product"
-                  onClick={() => handleProductIncrement(product)}
+                    onClick={() => handleProductIncrement(product)}
                   >
                     <MdAddCircleOutline size={20} />
                   </button>

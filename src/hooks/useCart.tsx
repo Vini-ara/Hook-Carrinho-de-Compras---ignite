@@ -41,14 +41,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const alreadyInCart = cartArray.find(element => element.id === productId)
   
       const product = await api.get(`http://localhost:3333/products/${productId}`)
-      
-      const stock = await api.get(`http://localhost:3333/stock/${productId}`)
   
       const shoe = product.data
-    
-      const shoeAmount = stock.data.amount
 
-      if(!shoeAmount || !shoe) throw new Error()
+      if(!shoe) throw new Error()
 
       if(!alreadyInCart) {
 
@@ -57,23 +53,12 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
         return 
       }
+
+      updateProductAmount({productId: productId, amount: 1})
       
-      if(alreadyInCart.amount === shoeAmount) {
-        throw new Error('Quantidade solicitada fora de estoque')
-      }
-      
-      const index = cartArray.indexOf(alreadyInCart)
-
-      alreadyInCart.amount += 1 
-
-      cartArray.splice(index, 1, alreadyInCart)
-
-      localStorage.setItem('@RocketShoes:cart', JSON.stringify(cartArray))
-      setCart(cartArray)
-
     } catch (error){
       const e = error as Error
-      e.message ? toast.error(e.message) : toast.error("Erro na adição do produto")
+      e.message === 'Quantidade solicitada fora de estoque' ? toast.error(e.message) : toast.error("Erro na adição do produto")
     }
   };
 
@@ -116,7 +101,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
       if(!stockAmount) throw new Error()
 
-      if(element.amount + amount <= 0) return 
+      if(element.amount + amount < 1) return 
 
       if(element.amount + amount > stockAmount) throw new Error("Quantidade solicitada fora de estoque")
 
@@ -129,7 +114,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
     } catch (error){
       const e = error as Error
-      e.message ? toast.error(e.message) : toast.error("Erro na alteração de quantidade do produto")
+      e.message === 'Quantidade solicitada fora de estoque' ? toast.error(e.message) : toast.error("Erro na adição do produto")
     }
   };
 
